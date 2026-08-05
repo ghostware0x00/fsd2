@@ -7,11 +7,24 @@ function App() {
   const [customers, setCustomers] = useState([]);
   const [users, setUsers] = useState([]);
 
-  const addCustomer = (customer) => {
-    setCustomers([...customers, customer]);
+  // Load database customers
+
+  const loadCustomers = async () => {
+    const res = await axios.get("/api/customers");
+    setCustomers(res.data);
+  };
+
+  // Add customer
+
+  const addCustomer = async (customer) => {
+    await axios.post("/api/customers", customer);
+
+    loadCustomers();
   };
 
   useEffect(() => {
+    loadCustomers();
+
     axios
       .get("https://jsonplaceholder.typicode.com/users")
       .then((res) => {
