@@ -1,15 +1,21 @@
 const express = require("express");
 const router = express.Router();
 
-const Customer = require("../models/Customer");
+const customerStore = require("../data/customerStore");
 
 // Insert customer
 
 router.post("/", async (req, res) => {
   try {
-    const customer = new Customer(req.body);
+    const { name, account } = req.body;
 
-    await customer.save();
+    if (typeof name !== "string" || typeof account !== "string" || !name.trim() || !account.trim()) {
+      return res.status(400).json({
+        error: "Name and account are required.",
+      });
+    }
+
+    const customer = await customerStore.addCustomer({ name, account });
 
     res.status(201).json(customer);
   } catch (err) {
@@ -23,7 +29,7 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const customers = await Customer.find();
+    const customers = await customerStore.getCustomers();
 
     res.json(customers);
   } catch (err) {
